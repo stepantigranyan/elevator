@@ -1,52 +1,100 @@
+import Floor from "../models/floorModel.js";
+
 class Memory {
     #floorsQueue;
+    #direction;
+    #currentFloor;
 
-    constructor(currentFloor) {
+    constructor() {
         this.#floorsQueue = [];
+        this.#direction = 'up';
+        this.#currentFloor = this.#__initCurrentFloor__();
     }
 
-    addFloor(floor) {
-        this.#sortQueue(floor);
+    #__initCurrentFloor__() {
+        return new Floor({ id: 'floor-1', floor: 1, inQueue: false });
     }
 
-    removeFloor(floor) {
-        this.#floorsQueue.filter(removedFloor => removedFloor.getId() !== floor.getId())
+    getCurrentFloor() {
+        return this.#currentFloor;
     }
 
-    refreshQueue() {
-        
+    setCurrentFloor(floor) {
+        this.#currentFloor = floor;
     }
 
-    #sortQueue(floor, currentFloor, direction) {
-        if (floor !== undefined) {
-            this.#floorsQueue.push(floor);
+    setDirection(finalFloor) {
+        if (finalFloor === undefined) {
+            return;
         }
 
+        if (finalFloor.getFloor() > this.#currentFloor.getFloor()) {
+            this.#direction = 'up';
+        } else if (finalFloor.getFloor() < this.#currentFloor.getFloor()) {
+            this.#direction = 'down';
+        }
+    }
+
+    getDirection() {
+        return this.#direction;
+    }
+
+    addOrRemoveFloor(floor) {
+        const floorInQueue = this.#floorsQueue.find(oldFloor => oldFloor.getFloor() === floor.getFloor());
+        if (floorInQueue === undefined) {
+            this.#floorsQueue.push(floor);
+            floor.setInQueue(true);
+        } else {
+            this.#floorsQueue = this.#floorsQueue.filter(oldFloor => oldFloor.getFloor() !== floorInQueue.getFloor());
+            floor.setInQueue(false);
+        }
+
+        this.#sortQueue();
+    }
+
+    getListLength() {
+        return this.#floorsQueue.length;
+    }
+
+    getFinalFloor() {
+        return this.#floorsQueue[0];
+    }
+
+    #sortQueue() {
+        const currentFloor = this.#currentFloor;
+        const direction = this.#direction;
         const floorsQueue = this.#floorsQueue;
 
-        const hightFloors = [];
+
+        const highFloors = [];
         const lowFloors = [];
 
         const currentFloorNumber = currentFloor.getFloor();
 
         for (let i = 0; i < floorsQueue.length; i++) {
-            const floor = floorsQueue[i];
-            const floorNumber = floor.getFloor();
+            const floorInQueue = floorsQueue[i];
+            const floorNumber = floorInQueue.getFloor();
 
-            if (currentFloorNumber > floorNumber) {
-                hightFloors.push(floor);
+            if (currentFloorNumber < floorNumber) {
+                highFloors.push(floorInQueue);
+            } else if (currentFloorNumber > floorNumber)  {
+                lowFloors.push(floorInQueue);
             } else {
-                lowFloors.push(floor);
+                if (direction === 'up') {
+                    lowFloors.push(floorInQueue);
+                } else {
+                    highFloors.push(floorInQueue);
+                }
             }
         }
 
-        hightFloors.sort((first, second) => first.getFloor() - second.getFloor());
+        highFloors.sort((first, second) => first.getFloor() - second.getFloor());
         lowFloors.sort((first, second) => second.getFloor() - first.getFloor());
 
         if (direction === 'up') {
-            this.#floorsQueue = [...hightFloors, ...lowFloors];
+            this.#floorsQueue = [...highFloors, ...lowFloors];
         } else if (direction === 'down') {
-            this.#floorsQueue = [...lowFloors, ...hightFloors];
+            this.#floorsQueue = [...lowFloors, ...highFloors];
         }
 
     }

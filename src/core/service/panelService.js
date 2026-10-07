@@ -1,18 +1,13 @@
-import { FLOORS } from '../../const/index.js';
-import Floor from '../models/floorModel.js';
+import { buttons } from '../../const/index.js';
 
 class Panel {
     #list;
 
     constructor() {
-        this.#list = this.#__init__(FLOORS);
+        this.#list = buttons;
     }
 
-    #__init__(floors) {
-        return floors.map((floor) => new Floor(floor));
-    }
-
-    getNearestFloor(currentFloor, direction) {
+    getNextFloor(currentFloor, direction) {
         const list = this.#list;
 
         if (direction === 'up') {
@@ -26,6 +21,10 @@ class Panel {
         const list = this.#list;
 
         return list.find((floor) => floor.getId() === id);
+    }
+
+    getAll() {
+        return this.#list;
     }
 }
 

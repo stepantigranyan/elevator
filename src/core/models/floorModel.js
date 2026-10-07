@@ -1,10 +1,12 @@
 class Floor {
     #id;
     #floor;
+    #inQueue;
 
-    constructor({ id, floor }) {
+    constructor({ id, floor, inQueue }) {
         this.#id = id;
         this.#floor = floor;
+        this.#inQueue = inQueue;
     }
 
     getId() {
@@ -13,6 +15,14 @@ class Floor {
 
     getFloor() {
         return this.#floor;
+    }
+
+    setInQueue(bool) {
+        this.#inQueue = bool;
+    }
+
+    getInQueue() {
+        return this.#inQueue;
     }
 }
 
